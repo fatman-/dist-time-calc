@@ -82,7 +82,7 @@ const run = async inputWorkbook => {
 					destination,
 					row.values[5],
 				);
-				console.log('...for the following times on', tomorrowString, ':');
+				console.log('...for the following times on %s:', tomorrowString.trim());
 				console.log(config.departureTimes);
 				const additionalRowValues = row.values;
 				let distanceValue = null;
