@@ -1,0 +1,17 @@
+{
+  "name": "dist-time-calc",
+  "version": "1.0.0",
+  "description": "A simple node project to calculate distance between LatLon pairs, and their distance in traffic at different times in a day",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "exceljs": "^1.4.6",
+    "moment": "^2.22.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sai Kishore Komanduri",
+  "license": "ISC"
+}
