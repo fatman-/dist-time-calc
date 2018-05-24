@@ -25,6 +25,7 @@ const createEmptyOutputWorkbook = () => {
 };
 
 const run = async inputWorkbook => {
+	console.time('LatLong Pairs Distance/Duration Calculation');
 	try {
 		await inputWorkbook.xlsx.readFile(path.normalize(config.pathToInputSheet))
 	} catch (e) {
@@ -115,7 +116,7 @@ const run = async inputWorkbook => {
 			}
 		}
 	});
-
+	console.timeEnd('LatLong Pairs Distance/Duration Calculation');
 	return outputWorkbook.xlsx.writeFile(path.normalize(config.pathToOutputSheet));
 }
 
