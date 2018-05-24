@@ -18,13 +18,13 @@ const departureTimes = [
 	'05:00:00 +0530'
 ];
 
-const calcLimit = 4;
+const calcLimit = 5;
 
 module.exports = {
 	googMapsApiUrl: 'https://maps.googleapis.com/maps/api/directions/json',
 	googMapsApiKey: getGoogMapsApiKey('./secret.js'), // REPLACE THIS WITH YOUR API KEY
-	pathToInputSheet: './example.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH
-	pathToOutputSheet: './output.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH
+	pathToInputSheet: './data/input.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH
+	pathToOutputSheet: './data/output.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH
 	departureTimes,
 	apiRateLimit: calcLimit * departureTimes.length,
 }

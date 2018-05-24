@@ -12,5 +12,6 @@ module.exports = {
 	googMapsApiKey: 'YOUR_API_KEY'
 	pathToInputSheet: './relative/path/to/inputSheet',
 	pathToInputSheet: './relative/path/to/outputSheet',
+	...
 }
 ```

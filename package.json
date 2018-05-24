@@ -13,5 +13,6 @@
     "start": "node index.js"
   },
   "author": "Sai Kishore Komanduri",
+  "repository": "https://github.com/fatman-/dist-time-calc",
   "license": "ISC"
 }
