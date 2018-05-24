@@ -87,7 +87,8 @@ const run = async inputWorkbook => {
 				let distanceValue = null;
 				await asyncForEach(apiPointsToCall, async (apiPoint, index) => {
 					try {
-						const { data } = await axios.get(apiPoint);
+						const result = await axios.get(apiPoint);
+						const { data, status } = result;
 						const [route] = data.routes;
 						const [leg] = route.legs;
 						const { distance, duration_in_traffic } = leg;
