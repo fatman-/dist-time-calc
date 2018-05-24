@@ -23,8 +23,8 @@ const calcLimit = 5;
 module.exports = {
 	googMapsApiUrl: 'https://maps.googleapis.com/maps/api/directions/json',
 	googMapsApiKey: getGoogMapsApiKey('./secret.js'), // REPLACE THIS WITH YOUR API KEY
-	pathToInputSheet: './data/input.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH
-	pathToOutputSheet: './data/output.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH
+	pathToInputSheet: './data/input.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH, TRY './example.xlsx'
+	pathToOutputSheet: './data/output.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH, TRY './output.xlsx'
 	departureTimes,
 	apiRateLimit: calcLimit * departureTimes.length,
 }
