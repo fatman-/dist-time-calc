@@ -28,7 +28,7 @@ const run = async inputWorkbook => {
 	try {
 		await inputWorkbook.xlsx.readFile(path.normalize(config.pathToInputSheet))
 	} catch (e) {
-		console.log('No input (excel) file found at %s. Please update your config.js')
+		console.log('No input (excel) file found at %s. Please update your config.js', config.pathToInputSheet)
 	}
 
 	const inputWorkSheet1 = inputWorkbook.getWorksheet('Sheet1');
@@ -40,6 +40,7 @@ const run = async inputWorkbook => {
 	const rows = []
 	inputWorkSheet1.eachRow({ includeEmpty: true }, row => rows.push(row));
 
+	let dataRowNum = 0;
 	await asyncForEach(rows, async (row, idx) => {
 		const rowNumber = idx + 1;
 		// HACK: The following code assumes the structure of the input sheet
@@ -60,6 +61,7 @@ const run = async inputWorkbook => {
 		}
 
 		if (isDataRow) {
+			dataRowNum += 1;
 			if (apiCalls < config.apiRateLimit) {
 				const origin = `${row.values[2]},${row.values[1]}`; // 'Latitude,Longitude'
 				const destination = `${row.values[4]},${row.values[3]}`;
@@ -72,14 +74,12 @@ const run = async inputWorkbook => {
 						`&departure_time=${t}`
 					);
 				});
-				console.log('Row Number:', rowNumber);
+				console.log('#%s', dataRowNum);
 				console.log(
-					'Calculating distance, and duration in traffic, for this Origin—Destination: %s—%s',
+					'Calculating distance, and duration in traffic, for this Origin—Destination: %s—%s (Highyway: %s)',
 					origin,
 					destination,
-					'(Highyway:',
 					row.values[5],
-					')'
 				);
 				console.log('...for the following times on', tomorrowString, ':');
 				console.log(config.departureTimes);
