@@ -2,6 +2,7 @@ const Excel = require('exceljs');
 const config = require('./config');
 const moment = require('moment');
 const axios = require('axios');
+const path = require('path');
 
 const asyncForEach = async (arr, callback) => {
 	for (let idx = 0, len = arr.length; idx < len; idx += 1) {
@@ -25,7 +26,7 @@ const createEmptyOutputWorkbook = () => {
 
 const run = async inputWorkbook => {
 	try {
-		await inputWorkbook.xlsx.readFile(config.pathToInputSheet)
+		await inputWorkbook.xlsx.readFile(path.normalize(config.pathToInputSheet))
 	} catch (e) {
 		console.log('No input (excel) file found at %s. Please update your config.js')
 	}
@@ -71,6 +72,7 @@ const run = async inputWorkbook => {
 						`&departure_time=${t}`
 					);
 				});
+				console.log('Row Number:', rowNumber);
 				console.log(
 					'Calculating distance, and duration in traffic, for this Origin—Destination: %s—%s',
 					origin,
@@ -113,7 +115,7 @@ const run = async inputWorkbook => {
 		}
 	});
 
-	return outputWorkbook.xlsx.writeFile(config.pathToOutputSheet);
+	return outputWorkbook.xlsx.writeFile(path.normalize(config.pathToOutputSheet));
 }
 
 run(new Excel.Workbook());
