@@ -1,7 +1,7 @@
 {
   "name": "dist-time-calc",
   "version": "1.0.0",
-  "description": "A simple node project to calculate distance between LatLon pairs, and their distance in traffic at different times in a day",
+  "description": "A simple node project to calculate distance between LatLon pairs, and their distance in traffic at different times in a day, using Google Maps Directions API",
   "main": "index.js",
   "dependencies": {
     "axios": "^0.18.0",
