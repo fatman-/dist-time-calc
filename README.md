@@ -5,7 +5,6 @@
 3. Run `npm install` to install required packages
 4. Replace `getGoogMapsApiKey('./secret.js')` in `config.js` file with your Google Maps API key
 5. Replace other config items (`pathToInputSheet`, `pathToOutputSheet`, `departureTimes`, etc...) as per your needs.
-
 ```js
 module.exports = {
 	...
@@ -15,3 +14,4 @@ module.exports = {
 	...
 }
 ```
+6. Finally, run `npm start` to start the script.
