@@ -12,7 +12,7 @@ const departureTimes = [
 	'05:00:00 +0530'
 ];
 
-const calcLimit = 200; // Maximum no. of lat long pairs to perform calculations on
+const calcLimit = 4; // Maximum no. of lat long pairs to perform calculations on
 
 module.exports = {
 	googMapsApiUrl: 'https://maps.googleapis.com/maps/api/directions/json',

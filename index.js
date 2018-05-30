@@ -24,6 +24,27 @@ const createEmptyOutputWorkbook = () => {
 	return { outputWorkbook, outputWorkSheet1 };
 };
 
+const makeApiUrls = (apiUrl, apiKey, depTimes, tomorrowString, origin, destination, oriDestSwap = false) => {
+	const depUnixTimes = (Array.isArray(depTimes) ? depTimes : [depTimes]).map(
+		t => moment(tomorrowString + t).format('X')
+	);
+	return depUnixTimes.map(t => {
+		return oriDestSwap
+			? (
+				`${apiUrl}?key=${apiKey}` +
+				`&origin=${destination}` +
+				`&destination=${origin}` +
+				`&departure_time=${t}`
+			)
+			: (
+				`${apiUrl}?key=${apiKey}` +
+				`&origin=${origin}` +
+				`&destination=${destination}` +
+				`&departure_time=${t}`
+			);
+	});
+};
+
 const run = async inputWorkbook => {
 	console.time('LatLong Pairs Distance/Duration Calculation');
 	try {
@@ -66,41 +87,105 @@ const run = async inputWorkbook => {
 			if (apiCalls < config.apiRateLimit) {
 				const origin = `${row.values[2]},${row.values[1]}`; // 'Latitude,Longitude'
 				const destination = `${row.values[4]},${row.values[3]}`;
+
 				const depUnixTimes = config.departureTimes.map(t => moment(tomorrowString + t).format('X'));
-				const apiPointsToCall = depUnixTimes.map(t => {
-					return (
-						`${config.googMapsApiUrl}?key=${config.googMapsApiKey}` +
-						`&origin=${origin}` +
-						`&destination=${destination}` +
-						`&departure_time=${t}`
-					);
-				});
+
 				console.log('#%s', dataRowNum);
+				const additionalRowValues = row.values;
+				const apiPointsToCall = makeApiUrls(
+					config.googMapsApiUrl,
+					config.googMapsApiKey,
+					config.departureTimes,
+					tomorrowString,
+					origin,
+					destination
+				);
+				const apiPointsToCallWithOriDistSwap = makeApiUrls(
+					config.googMapsApiUrl,
+					config.googMapsApiKey,
+					config.departureTimes,
+					tomorrowString,
+					origin,
+					destination,
+					true
+				);
+				const [firstApiPoint, ...otherApiPointsToCall] = apiPointsToCall;
+				const [
+					firstApiPointWithOriDistSwap,
+					...otherApiPointsToCallWithOriDistSwap
+				] = apiPointsToCallWithOriDistSwap;
+
 				console.log(
 					'Calculating distance, and duration in traffic, for this Origin—Destination: %s—%s (Highyway: %s)',
 					origin,
 					destination,
 					row.values[5],
 				);
+				console.log('...for the following time on %s:', tomorrowString.trim());
+				console.log(config.departureTimes[0]);
+				const result = await axios.get(firstApiPoint);
+				console.log('The distance is: %s', result.data.routes[0].legs[0].distance.text);
+
+				console.log(
+					'Calculating distance, and duration in traffic, for this Origin—Destination: %s—%s (Highyway: %s)',
+					destination,
+					origin,
+					row.values[5],
+				);
+				console.log('...for the following time on %s:', tomorrowString.trim());
+				console.log(config.departureTimes[0]);
+				const resultWithOriDistSwap = await axios.get(firstApiPointWithOriDistSwap);
+				console.log('The distance is: %s', resultWithOriDistSwap.data.routes[0].legs[0].distance.text);
+
+				const shouldSwapOriDist = (
+					parseInt(result.data.routes[0].legs[0].distance.text.split('km')[0]) >
+					parseInt(resultWithOriDistSwap.data.routes[0].legs[0].distance.text.split('km')[0])
+				);
+
+				console.log('Swapping origin, destination:', shouldSwapOriDist, '\n');
+
+				const distanceText = shouldSwapOriDist
+					? resultWithOriDistSwap.data.routes[0].legs[0].distance.text
+					: result.data.routes[0].legs[0].distance.text;
+				console.log('The distance is: %s', distanceText);
+
+				const durationInTrafficText = shouldSwapOriDist
+					? resultWithOriDistSwap.data.routes[0].legs[0].duration_in_traffic.text
+					: result.data.routes[0].legs[0].duration_in_traffic.text;
+
+				additionalRowValues.push(distanceText);
+				console.log(
+					'At %s, you should reach your destination in %s',
+					config.departureTimes[0],
+					durationInTrafficText
+				);
+				additionalRowValues.push(durationInTrafficText);
+				apiCalls += 2;
+
+				const [firstDepartureTime, ...restDepartureTimes] = config.departureTimes;
+
+				const [newOrigin, newDestination] = shouldSwapOriDist ? [destination, origin] : [origin, destination];
+				console.log(
+					'Calculating distance, and duration in traffic, for this Origin—Destination: %s—%s (Highyway: %s)',
+					newOrigin,
+					newDestination,
+					row.values[5],
+				);
 				console.log('...for the following times on %s:', tomorrowString.trim());
-				console.log(config.departureTimes);
-				const additionalRowValues = row.values;
-				let distanceValue = null;
-				await asyncForEach(apiPointsToCall, async (apiPoint, index) => {
+				console.log(restDepartureTimes);
+				const newApiPointsToCall = shouldSwapOriDist
+					? otherApiPointsToCallWithOriDistSwap
+					: otherApiPointsToCall
+				await asyncForEach(newApiPointsToCall, async (apiPoint, index) => {
 					try {
 						const result = await axios.get(apiPoint);
 						const { data, status } = result;
 						const [route] = data.routes;
 						const [leg] = route.legs;
 						const { distance, duration_in_traffic } = leg;
-						if (!distanceValue) {
-							console.log('The distance is: %s', distance.text);
-							distanceValue = distance.text;
-							additionalRowValues.push(distanceValue);
-						}
 						console.log(
 							'At %s, you should reach your destination in %s',
-							config.departureTimes[index],
+							config.departureTimes[index + 1],
 							duration_in_traffic.text
 						);
 						additionalRowValues.push(duration_in_traffic.text);
