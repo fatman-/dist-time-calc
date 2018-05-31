@@ -1,5 +1,11 @@
 const path = require('path');
-const secretConfig = require('./secret');
+let secretConfig;
+try {
+	secretConfig = require('./secret');
+} catch (e) {
+	console.log(e);
+	secretConfig = '';
+}
 
 const departureTimes = [
 	'09:00:00 +0530',
@@ -16,9 +22,9 @@ const calcLimit = 4; // Maximum no. of lat long pairs to perform calculations on
 
 module.exports = {
 	googMapsApiUrl: 'https://maps.googleapis.com/maps/api/directions/json',
-	googMapsApiKey: secretConfig.googMapsApiKey, // REPLACE THIS WITH YOUR API KEY
-	pathToInputSheet: './example.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH, TRY './example.xlsx'
-	pathToOutputSheet: './output.xlsx', // YOU CAN REPLACE THIS WITH A CORRESPONDING PATH, TRY './output.xlsx'
+	googMapsApiKey: secretConfig && secretConfig.googMapsApiKey || '', // REPLACE '' WITH YOUR API KEY
+	pathToInputSheet: './example.xlsx', // YOU CAN REPLACE './example.xlsx' WITH A CORRESPONDING PATH
+	pathToOutputSheet: './output.xlsx', // YOU CAN REPLACE './output.xlsx' WITH A CORRESPONDING PATH
 	departureTimes,
 	apiRateLimit: calcLimit * departureTimes.length,
 }
